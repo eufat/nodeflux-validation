@@ -9,6 +9,7 @@ const createInitialState = () => {
 
 class App extends Component {
     state = {
+        onSave: false,
         stats: {
             content: 0,
             validated: 0,
@@ -145,12 +146,15 @@ class App extends Component {
     };
 
     createPDF = () => {
-        const input = window.document.getElementById("pdf");
-        html2canvas(input).then(canvas => {
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, "JPEG", 0, 0);
-            pdf.save("download.pdf");
+        this.setState({ ...this.state, onSave: true }, () => {
+            const input = window.document.getElementById("pdf");
+            html2canvas(input).then(canvas => {
+                const imgData = canvas.toDataURL("image/png");
+                const pdf = new jsPDF();
+                pdf.addImage(imgData, "JPEG);
+                pdf.save("download.pdf");
+            });
+            this.setState({ ...this.state, onSave: false });
         });
     };
 
@@ -322,7 +326,7 @@ class App extends Component {
                         Save as CSV
                     </button>
                     <button onClick={() => this.createPDF()}>
-                        Save as PDF
+                        {this.state.onSave ? "Loading ..." : "Save as PDF"}
                     </button>
                 </div>
             </div>
