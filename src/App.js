@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import * as jsPDF from "jspdf";
 import "./App.css";
 
 const createInitialState = () => {
@@ -89,6 +90,15 @@ class App extends Component {
         }
     };
 
+    createPDF = () => {
+        const printDoc = new jsPDF();
+        printDoc.fromHTML(document.getElementById("pdf"), 15, 15, {
+            width: 170
+        });
+        printDoc.autoPrint();
+        printDoc.output("dataurlnewwindow"); // this opens a new popup,  after this the PDF opens the print window view but there are browser inconsistencies with how this is handled
+    };
+
     render() {
         const { data, stats } = this.state;
 
@@ -158,7 +168,7 @@ class App extends Component {
                         />
                     </div>
                     <br />
-                    <div className="super">
+                    <div id="pdf">
                         <div className="stats">
                             <div className="container">
                                 <h2>Content: {this.state.stats.content} </h2>
@@ -193,7 +203,7 @@ class App extends Component {
                     <button onClick={() => this.createCSV(this.state)}>
                         Save as CSV
                     </button>
-                    <button onClick={() => this.createPDF(this.state)}>
+                    <button onClick={() => this.createPDF()}>
                         Save as PDF
                     </button>
                 </div>
