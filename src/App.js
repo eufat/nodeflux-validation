@@ -92,9 +92,7 @@ class App extends Component {
 
     createPDF = () => {
         const printDoc = new jsPDF();
-        printDoc.fromHTML(document.getElementById("pdf"), 15, 15, {
-            width: 170
-        });
+        printDoc.fromHTML(window.document.getElementById("pdf"));
         printDoc.autoPrint();
         printDoc.output("dataurlnewwindow"); // this opens a new popup,  after this the PDF opens the print window view but there are browser inconsistencies with how this is handled
     };
