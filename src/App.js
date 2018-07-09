@@ -149,9 +149,36 @@ class App extends Component {
         this.setState({ ...this.state, onSave: true }, () => {
             const input = window.document.getElementById("pdf");
             html2canvas(input).then(canvas => {
-                const imgData = canvas.toDataURL("image/png");
-                const pdf = new jsPDF();
-                pdf.addImage(imgData, "JPEG", 0, 0, 0, 0);
+                // const imgData = canvas.toDataURL("image/png");
+                const pdf = new jsPDF("landscape");
+                let y = 0;
+
+                for (let item of this.state.data) {
+                    let x = 0;
+
+                    for (let key in item) {
+                        item.hasOwnProperty(key);
+
+                        x += 20;
+                        if (key === "image") {
+                            const imgData =
+                                "data:image/jpeg;base64," +
+                                window.atob(`/images/${item[key]}.jpg`);
+                            console.log(imgData);
+                            // pdf.addImage(imgData, "JPEG", x, y);
+                            x += 30;
+                        } else {
+                            pdf.text(key, x, y);
+                            x += 30;
+                            pdf.text(item[key], x, y);
+                            x += 30;
+                        }
+                    }
+
+                    y += 20;
+                }
+
+                // pdf.addImage(imgData, "JPEG", 0, 0, 0, 0);
                 pdf.save("download.pdf");
             });
             this.setState({ ...this.state, onSave: false });
@@ -165,7 +192,7 @@ class App extends Component {
             return (
                 <div className="datapoint">
                     <img
-                        src={`/images/${item.image}`}
+                        src={`/images/${item.image}.jpg`}
                         alt={`images-${item.image}`}
                     />
                 </div>
