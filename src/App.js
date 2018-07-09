@@ -163,9 +163,9 @@ class App extends Component {
                         if (key === "image") {
                             const imgData =
                                 "data:image/jpeg;base64," +
-                                window.atob(`/images/${item[key]}.jpg`);
-                            console.log(imgData);
-                            // pdf.addImage(imgData, "JPEG", x, y);
+                                Base64.encode(`/images/${item[key]}.jpg`);
+                            // console.log(imgData);
+                            pdf.addImage(imgData, "JPEG", x, y);
                             x += 30;
                         } else {
                             pdf.text(key, x, y);
