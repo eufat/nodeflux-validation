@@ -1,34 +1,16 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 
 const createInitialState = () => {
-    return [
-        {
-            image: "./image1.jpg",
-            content: "B 1023 C",
-            validation: "false"
-        },
-        {
-            image: "./image1.jpg",
-            content: "B 1023 C",
-            validation: "false"
-        },
-        {
-            image: "./image1.jpg",
-            content: "B 1023 C",
-            validation: "false"
-        },
-        {
-            image: "./image1.jpg",
-            content: "B 1023 C",
-            validation: "false"
-        }
-    ];
+    return [];
 };
 
 class App extends Component {
     state = {
+        stats: {
+            content: 0,
+            validated: 0
+        },
         data: createInitialState()
     };
 
@@ -45,6 +27,24 @@ class App extends Component {
         window.open(encodedUri);
     };
 
+    processStats = data => {
+        const validationNumbers = data.map(
+            item => (item.validation === "true" ? 1 : 0)
+        );
+
+        const validated = validationNumbers.reduce(
+            (accumulator, currentValue) => accumulator + currentValue
+        );
+
+        const stats = {
+            ...this.stats,
+            content: data.length,
+            validated
+        };
+
+        return stats;
+    };
+
     handleChange = (event, index) => {
         const prevData = this.state.data;
         const newData = [...prevData];
@@ -54,7 +54,8 @@ class App extends Component {
         };
 
         this.setState({
-            data: newData
+            data: newData,
+            stats: this.processStats(newData)
         });
     };
 
@@ -77,8 +78,10 @@ class App extends Component {
                     return output;
                 });
 
-                console.log(data);
-                this.setState({ data });
+                this.setState({
+                    data,
+                    stats: this.processStats(data)
+                });
             };
             r.readAsText(f);
         } else {
@@ -87,12 +90,15 @@ class App extends Component {
     };
 
     render() {
-        const { data } = this.state;
+        const { data, stats } = this.state;
 
         const imagesList = data.map(item => {
             return (
                 <div className="datapoint">
-                    <img src={item.image} />
+                    <img
+                        src={`/images/${item.image}`}
+                        alt={`images-${item.image}`}
+                    />
                 </div>
             );
         });
@@ -132,6 +138,9 @@ class App extends Component {
             );
         });
 
+        let percentValidated = (stats.validated * 100) / stats.content;
+        percentValidated = !!percentValidated ? percentValidated : 0;
+
         return (
             <div>
                 <div className="app">
@@ -149,17 +158,35 @@ class App extends Component {
                         />
                     </div>
                     <br />
-                    <div className="container">
-                        <div>Images </div>
-                        {imagesList}
-                    </div>
-                    <div className="container">
-                        <div>Contents </div>
-                        {contentsList}
-                    </div>
-                    <div className="container">
-                        <div>Validator</div>
-                        <div>{validationsList}</div>
+                    <div className="super">
+                        <div className="stats">
+                            <div className="container">
+                                <h2>Content: {this.state.stats.content} </h2>
+                            </div>
+                            <div className="container">
+                                <h2>Validated: {this.state.stats.validated}</h2>
+                            </div>
+                            <div className="container">
+                                <h2>
+                                    Accuracy:
+                                    {percentValidated}%
+                                </h2>
+                            </div>
+                        </div>
+                        <div className="contents">
+                            <div className="container">
+                                <div>Images </div>
+                                {imagesList}
+                            </div>
+                            <div className="container">
+                                <div>Contents </div>
+                                {contentsList}
+                            </div>
+                            <div className="container">
+                                <div>Validator</div>
+                                <div>{validationsList}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="button-container">
