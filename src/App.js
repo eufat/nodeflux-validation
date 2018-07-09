@@ -10,7 +10,8 @@ class App extends Component {
     state = {
         stats: {
             content: 0,
-            validated: 0
+            validated: 0,
+            blur: 0
         },
         data: createInitialState()
     };
@@ -32,26 +33,46 @@ class App extends Component {
         const validationNumbers = data.map(
             item => (item.validation === "true" ? 1 : 0)
         );
+        const blurNumbers = data.map(item => (item.blur === "true" ? 1 : 0));
 
         const validated = validationNumbers.reduce(
+            (accumulator, currentValue) => accumulator + currentValue
+        );
+
+        const blur = blurNumbers.reduce(
             (accumulator, currentValue) => accumulator + currentValue
         );
 
         const stats = {
             ...this.stats,
             content: data.length,
-            validated
+            validated,
+            blur
         };
 
         return stats;
     };
 
-    handleChange = (event, index) => {
+    handleValidationChange = (event, index) => {
         const prevData = this.state.data;
         const newData = [...prevData];
         newData[index] = {
             ...newData[index],
             validation: event.target.value
+        };
+
+        this.setState({
+            data: newData,
+            stats: this.processStats(newData)
+        });
+    };
+
+    handleBlurChange = (event, index) => {
+        const prevData = this.state.data;
+        const newData = [...prevData];
+        newData[index] = {
+            ...newData[index],
+            blur: event.target.value
         };
 
         this.setState({
@@ -73,7 +94,8 @@ class App extends Component {
                     const output = {
                         image: row[0],
                         content: row[1],
-                        validation: row[2].replace(/\s/g, "")
+                        validation: row[2].replace(/\s/g, ""),
+                        blur: row[3].replace(/\s/g, "")
                     };
 
                     return output;
@@ -128,7 +150,9 @@ class App extends Component {
                             name="validation"
                             value="true"
                             checked={item.validation === "true"}
-                            onChange={e => this.handleChange(e, index)}
+                            onChange={e =>
+                                this.handleValidationChange(e, index)
+                            }
                         />
                         <h2>True</h2>
                         <br />
@@ -137,7 +161,36 @@ class App extends Component {
                             name="validation"
                             value="false"
                             checked={item.validation === "false"}
-                            onChange={e => this.handleChange(e, index)}
+                            onChange={e =>
+                                this.handleValidationChange(e, index)
+                            }
+                        />
+                        <h2>False</h2>
+                        <br />
+                    </form>
+                </div>
+            );
+        });
+
+        const blursList = data.map((item, index) => {
+            return (
+                <div className="blur">
+                    <form>
+                        <input
+                            type="radio"
+                            name="blur"
+                            value="true"
+                            checked={item.blur === "true"}
+                            onChange={e => this.handleBlurChange(e, index)}
+                        />
+                        <h2>True</h2>
+                        <br />
+                        <input
+                            type="radio"
+                            name="blur"
+                            value="false"
+                            checked={item.blur === "false"}
+                            onChange={e => this.handleBlurChange(e, index)}
                         />
                         <h2>False</h2>
                         <br />
@@ -175,6 +228,9 @@ class App extends Component {
                                 <h2>Validated: {this.state.stats.validated}</h2>
                             </div>
                             <div className="container">
+                                <h2>Blur: {this.state.stats.blur}</h2>
+                            </div>
+                            <div className="container">
                                 <h2>
                                     Accuracy:
                                     {percentValidated}%
@@ -193,6 +249,10 @@ class App extends Component {
                             <div className="container">
                                 <div>Validator</div>
                                 <div>{validationsList}</div>
+                            </div>
+                            <div className="container">
+                                <div>Blur</div>
+                                <div>{blursList}</div>
                             </div>
                         </div>
                     </div>
