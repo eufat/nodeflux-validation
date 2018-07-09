@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import * as html2canvas from "html2canvas";
 import * as jsPDF from "jspdf";
 import "./App.css";
 
@@ -144,10 +145,13 @@ class App extends Component {
     };
 
     createPDF = () => {
-        const printDoc = new jsPDF();
-        printDoc.fromHTML(window.document.getElementById("pdf"));
-        printDoc.autoPrint();
-        printDoc.output("dataurlnewwindow"); // this opens a new popup,  after this the PDF opens the print window view but there are browser inconsistencies with how this is handled
+        const input = window.document.getElementById("pdf");
+        html2canvas(input).then(canvas => {
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF();
+            pdf.addImage(imgData, "JPEG", 0, 0);
+            pdf.save("download.pdf");
+        });
     };
 
     render() {
@@ -251,6 +255,7 @@ class App extends Component {
                     </div>
                     <br />
                     <div id="pdf">
+                        <div>Stats</div>
                         <div className="stats">
                             <div className="container">
                                 <h2>Content: {this.state.stats.content} </h2>
