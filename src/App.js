@@ -11,7 +11,11 @@ class App extends Component {
         stats: {
             content: 0,
             validated: 0,
-            blur: 0
+            blur: 0,
+            validatedBlur: 0,
+            validatedNotBlur: 0,
+            notValidatedBlur: 0,
+            notValidatedNotBlur: 0
         },
         data: createInitialState()
     };
@@ -30,24 +34,51 @@ class App extends Component {
     };
 
     processStats = data => {
-        const validationNumbers = data.map(
-            item => (item.validation === "true" ? 1 : 0)
-        );
-        const blurNumbers = data.map(item => (item.blur === "true" ? 1 : 0));
+        const validated = data
+            .map(item => (item.validation === "true" ? 1 : 0))
+            .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-        const validated = validationNumbers.reduce(
-            (accumulator, currentValue) => accumulator + currentValue
-        );
+        const blur = data
+            .map(item => (item.blur === "true" ? 1 : 0))
+            .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-        const blur = blurNumbers.reduce(
-            (accumulator, currentValue) => accumulator + currentValue
-        );
+        const validatedBlur = data
+            .map(
+                item =>
+                    item.validation === "true" && item.blur === "true" ? 1 : 0
+            )
+            .reduce((accumulator, currentValue) => accumulator + currentValue);
+
+        const validatedNotBlur = data
+            .map(
+                item =>
+                    item.validation === "true" && item.blur === "false" ? 1 : 0
+            )
+            .reduce((accumulator, currentValue) => accumulator + currentValue);
+
+        const notValidatedBlur = data
+            .map(
+                item =>
+                    item.validation === "false" && item.blur === "true" ? 1 : 0
+            )
+            .reduce((accumulator, currentValue) => accumulator + currentValue);
+
+        const notValidatedNotBlur = data
+            .map(
+                item =>
+                    item.validation === "false" && item.blur === "false" ? 1 : 0
+            )
+            .reduce((accumulator, currentValue) => accumulator + currentValue);
 
         const stats = {
             ...this.stats,
             content: data.length,
             validated,
-            blur
+            blur,
+            validatedBlur,
+            validatedNotBlur,
+            notValidatedBlur,
+            notValidatedNotBlur
         };
 
         return stats;
@@ -234,6 +265,30 @@ class App extends Component {
                                 <h2>
                                     Accuracy:
                                     {percentValidated}%
+                                </h2>
+                            </div>
+                            <div className="container">
+                                <h2>
+                                    Validated Blur:
+                                    {this.state.stats.validatedBlur}
+                                </h2>
+                            </div>
+                            <div className="container">
+                                <h2>
+                                    Validated Not Blur:
+                                    {this.state.stats.validatedNotBlur}
+                                </h2>
+                            </div>
+                            <div className="container">
+                                <h2>
+                                    Not Validated Blur:
+                                    {this.state.stats.notValidatedBlur}
+                                </h2>
+                            </div>
+                            <div className="container">
+                                <h2>
+                                    Not Validated Not Blur:
+                                    {this.state.stats.notValidatedNotBlur}
                                 </h2>
                             </div>
                         </div>
