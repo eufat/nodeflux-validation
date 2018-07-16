@@ -4,7 +4,11 @@
     "private": true,
     "dependencies": {
         "archiver": "^2.1.1",
+        "axios": "^0.18.0",
         "classnames": "^2.2.6",
+        "cors": "^2.8.4",
+        "csv-write-stream": "^2.0.0",
+        "express": "^4.16.3",
         "express-fileupload": "^0.4.0",
         "extract-zip": "^1.6.7",
         "html2canvas": "^1.0.0-alpha.12",
@@ -12,7 +16,8 @@
         "react": "^16.4.1",
         "react-dom": "^16.4.1",
         "react-pdf": "^3.0.5",
-        "react-scripts": "1.1.4"
+        "react-scripts": "1.1.4",
+        "rimraf": "^2.6.2"
     },
     "scripts": {
         "start": "react-scripts start",

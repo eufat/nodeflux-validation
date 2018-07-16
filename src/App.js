@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 import * as html2canvas from "html2canvas";
 import * as jsPDF from "jspdf";
 import "./App.css";
@@ -114,37 +115,6 @@ class App extends Component {
         });
     };
 
-    readSingleFile = evt => {
-        const f = evt.target.files[0];
-        if (f) {
-            const r = new FileReader();
-            r.onload = e => {
-                const contents = e.target.result;
-
-                let data = contents.split("\r\n");
-                data = data.map(item => {
-                    const row = item.split(",");
-                    const output = {
-                        image: row[0],
-                        content: row[1],
-                        validation: row[2].replace(/\s/g, ""),
-                        blur: row[3].replace(/\s/g, "")
-                    };
-
-                    return output;
-                });
-
-                this.setState({
-                    data,
-                    stats: this.processStats(data)
-                });
-            };
-            r.readAsText(f);
-        } else {
-            alert("Failed to load file");
-        }
-    };
-
     createPDF = () => {
         this.setState({ ...this.state, onSave: true }, () => {
             const input = window.document.getElementById("pdf");
@@ -184,6 +154,17 @@ class App extends Component {
         });
     };
 
+    handleOnUpload = () => {
+        const data = new FormData();
+        data.append("plateFile", document.getElementById("file").files[0]);
+
+        axios.post("http://localhost:8000/upload", data).then(res => {
+            const response = res.data;
+
+            this.setState({ ...this.state, data: response.data });
+        });
+    };
+
     render() {
         const { data, stats } = this.state;
 
@@ -191,8 +172,9 @@ class App extends Component {
             return (
                 <div className="datapoint">
                     <img
-                        src={`/images/${item.image}.jpg`}
+                        src={`${item.image}`}
                         alt={`images-${item.image}`}
+                        height={200}
                     />
                 </div>
             );
@@ -277,20 +259,18 @@ class App extends Component {
                     </header>
                     <br />
                     <div className="button-container">
-                        <input
-                            type="file"
-                            id="fileinput"
-                            onChange={e => this.readSingleFile(e)}
-                        />
-                        <form
-                            ref="uploadForm"
-                            id="uploadForm"
-                            action="http://localhost:8000/upload"
-                            method="post"
-                            encType="multipart/form-data"
-                        >
-                            <input type="file" name="plateFile" />
-                            <input type="submit" value="Upload" />
+                        <br />
+                        <form role="form" className="form">
+                            <div class="form-group">
+                                <label for="file">File</label>
+                                <input id="file" type="file" name="plateFile" />
+                            </div>
+                            <button
+                                onClick={() => this.handleOnUpload()}
+                                type="button"
+                            >
+                                Upload
+                            </button>
                         </form>
                     </div>
                     <br />

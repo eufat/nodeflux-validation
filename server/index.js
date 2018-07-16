@@ -4,6 +4,7 @@ const path = require("path");
 const extract = require("extract-zip");
 const fileUpload = require("express-fileupload");
 const rimraf = require("rimraf");
+const cors = require("cors");
 
 const app = express();
 const port = 8000;
@@ -13,6 +14,9 @@ app.listen(port, () => {
 });
 
 app.use(fileUpload());
+
+const production = false;
+if (!production) app.use(cors());
 
 app.post("/upload", (req, res) => {
     if (!req.files) return res.status(400).send("No files were uploaded.");
@@ -47,13 +51,15 @@ app.post("/upload", (req, res) => {
 
                         if (imageExtension.includes(fileExtension)) {
                             output.push({
-                                image: file,
+                                image: `/plate/${file}`,
                                 content: filename,
                                 validation: "false",
                                 blur: "false"
                             });
                         }
                     });
+
+                    // console.log(output);
 
                     res.status(200).send(JSON.stringify({ data: output }));
                 }
