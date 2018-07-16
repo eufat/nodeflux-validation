@@ -163,8 +163,7 @@ class App extends Component {
                         if (key === "image") {
                             const imgData =
                                 "data:image/jpeg;base64," +
-                                Base64.encode(`/images/${item[key]}.jpg`);
-                            // console.log(imgData);
+                                window.btoa(`/images/${item[key]}.jpg`);
                             pdf.addImage(imgData, "JPEG", x, y);
                             x += 30;
                         } else {
@@ -174,7 +173,7 @@ class App extends Component {
                             x += 30;
                         }
                     }
-
+                    pdf.line(20, 20, 60, 20);
                     y += 20;
                 }
 
@@ -283,6 +282,16 @@ class App extends Component {
                             id="fileinput"
                             onChange={e => this.readSingleFile(e)}
                         />
+                        <form
+                            ref="uploadForm"
+                            id="uploadForm"
+                            action="http://localhost:8000/upload"
+                            method="post"
+                            encType="multipart/form-data"
+                        >
+                            <input type="file" name="plateFile" />
+                            <input type="submit" value="Upload" />
+                        </form>
                     </div>
                     <br />
                     <div id="pdf">
