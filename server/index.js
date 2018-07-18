@@ -8,6 +8,7 @@ const fileUpload = require('express-fileupload');
 const rimraf = require('rimraf');
 const cors = require('cors');
 const PDFDocument = require('pdfkit');
+const bodyParser = require('body-parser');
 const _ = require('lodash');
 
 const app = express();
@@ -17,6 +18,7 @@ app.listen(port, () => {
     console.log(`Listening on port ${port}.`);
 });
 
+app.use(bodyParser.json());
 app.use(fileUpload());
 
 const filePath = path.join(__dirname, '..', 'public', 'plate.zip');
@@ -77,14 +79,14 @@ app.post('/upload', (req, res) => {
     });
 });
 
-app.get('/pdf', (req, res) => {
+app.post('/pdf', (req, res) => {
     console.log('Generating PDF.');
     const doc = new PDFDocument();
     let x = 20;
     let y = 20;
     let row = 0;
 
-    const output = getPlateFiles();
+    const output = req.body;
     const stats = processStats(output);
 
     doc.text(`Nodeflux License Plate Validation Report`, x, y);
@@ -201,9 +203,11 @@ const processStats = (data) => {
         )
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
+    const accuracy = `${Math.round((validated * 100) / data.length, 3)}%`;
+
     const stats = {
         content: data.length,
-        accuracy: `${validated / data.length}`,
+        accuracy,
         validated,
         blur,
         validatedBlur,

@@ -115,10 +115,12 @@ class App extends Component {
 
     createPDF = () => {
         this.setState({ ...this.state, onSave: true }, () => {
-            axios.get('http://localhost:8000/pdf').then((res) => {
-                window.location.assign('/download.pdf');
-                this.setState({ ...this.state, onSave: false });
-            });
+            axios
+                .post('http://localhost:8000/pdf', this.state.data)
+                .then((res) => {
+                    window.location.assign('/download.pdf');
+                    this.setState({ ...this.state, onSave: false });
+                });
         });
     };
 
