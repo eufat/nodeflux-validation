@@ -7,7 +7,7 @@ const extract = require('extract-zip');
 const fileUpload = require('express-fileupload');
 const rimraf = require('rimraf');
 const cors = require('cors');
-const jsPDF = require('node-jspdf');
+const PDFDocument = require('pdfkit');
 
 const app = express();
 const port = 8000;
@@ -23,11 +23,6 @@ const target = path.join(__dirname, '..', 'public', 'plate');
 
 const production = false;
 if (!production) app.use(cors());
-
-const base64Encode = (file) => {
-    let body = fs.readFileSync(file);
-    return body.toString('base64');
-};
 
 const getPlateFiles = () => {
     let files = [];
@@ -82,7 +77,7 @@ app.post('/upload', (req, res) => {
 });
 
 app.get('/pdf', (req, res) => {
-    const pdf = new jsPDF('landscape');
+    const doc = new PDFDocument();
     let y = 0;
 
     const output = getPlateFiles();
@@ -94,24 +89,22 @@ app.get('/pdf', (req, res) => {
             if (item.hasOwnProperty(key)) {
                 x += 20;
                 if (key === 'image') {
-                    const imgData =
-                        'data:image/jpeg;base64,' +
-                        base64Encode(`../public${item[key]}`);
-                    pdf.addImage(imgData, 'JPEG', x, y);
-                    x += 30;
+                    doc.image(`public${item[key]}`, x, y);
+                    x += 60;
                 } else {
-                    pdf.text(key, x, y);
-                    x += 30;
-                    pdf.text(item[key], x, y);
-                    x += 30;
+                    doc.text(key, x, y);
+                    x += 60;
+                    doc.text(item[key], x, y);
+                    x += 60;
                 }
             }
         }
-        pdf.line(20, 20, 60, 20);
         y += 20;
     }
 
-    // pdf.addImage(imgData, "JPEG", 0, 0, 0, 0);
-    pdf.save('download.pdf');
+    const pdfFilePath = 'public/download.pdf';
+
+    doc.pipe(fs.createWriteStream(pdfFilePath));
+    doc.end();
     res.status(200).send('READY');
 });
