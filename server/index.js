@@ -9,7 +9,6 @@ const rimraf = require('rimraf');
 const cors = require('cors');
 const PDFDocument = require('pdfkit');
 const bodyParser = require('body-parser');
-const _ = require('lodash');
 
 const app = express();
 const port = 8000;
@@ -203,7 +202,7 @@ const processStats = (data) => {
         )
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const accuracy = `${Math.round((validated * 100) / data.length, 3)}%`;
+    const accuracy = `${Math.round((validated * 100) / data.length, 3)} %`;
 
     const stats = {
         content: data.length,
