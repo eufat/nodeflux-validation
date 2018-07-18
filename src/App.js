@@ -1,8 +1,6 @@
-import React, { Component } from "react";
-import axios from "axios";
-import * as html2canvas from "html2canvas";
-import * as jsPDF from "jspdf";
-import "./App.css";
+import React, { Component } from 'react';
+import axios from 'axios';
+import './App.css';
 
 const createInitialState = () => {
     return [];
@@ -18,58 +16,58 @@ class App extends Component {
             validatedBlur: 0,
             validatedNotBlur: 0,
             notValidatedBlur: 0,
-            notValidatedNotBlur: 0
+            notValidatedNotBlur: 0,
         },
-        data: createInitialState()
+        data: createInitialState(),
     };
 
-    createCSV = data => {
+    createCSV = (data) => {
         const prevData = this.state.data;
 
-        let csvContent = "data:text/csv;charset=utf-8,";
+        let csvContent = 'data:text/csv;charset=utf-8,';
         for (let item of prevData) {
             let row = `${item.image},${item.content}, ${item.validation}`;
-            csvContent += row + "\r\n";
+            csvContent += row + '\r\n';
         }
 
         const encodedUri = encodeURI(csvContent);
         window.open(encodedUri);
     };
 
-    processStats = data => {
+    processStats = (data) => {
         const validated = data
-            .map(item => (item.validation === "true" ? 1 : 0))
+            .map((item) => (item.validation === 'true' ? 1 : 0))
             .reduce((accumulator, currentValue) => accumulator + currentValue);
 
         const blur = data
-            .map(item => (item.blur === "true" ? 1 : 0))
+            .map((item) => (item.blur === 'true' ? 1 : 0))
             .reduce((accumulator, currentValue) => accumulator + currentValue);
 
         const validatedBlur = data
             .map(
-                item =>
-                    item.validation === "true" && item.blur === "true" ? 1 : 0
+                (item) =>
+                    item.validation === 'true' && item.blur === 'true' ? 1 : 0
             )
             .reduce((accumulator, currentValue) => accumulator + currentValue);
 
         const validatedNotBlur = data
             .map(
-                item =>
-                    item.validation === "true" && item.blur === "false" ? 1 : 0
+                (item) =>
+                    item.validation === 'true' && item.blur === 'false' ? 1 : 0
             )
             .reduce((accumulator, currentValue) => accumulator + currentValue);
 
         const notValidatedBlur = data
             .map(
-                item =>
-                    item.validation === "false" && item.blur === "true" ? 1 : 0
+                (item) =>
+                    item.validation === 'false' && item.blur === 'true' ? 1 : 0
             )
             .reduce((accumulator, currentValue) => accumulator + currentValue);
 
         const notValidatedNotBlur = data
             .map(
-                item =>
-                    item.validation === "false" && item.blur === "false" ? 1 : 0
+                (item) =>
+                    item.validation === 'false' && item.blur === 'false' ? 1 : 0
             )
             .reduce((accumulator, currentValue) => accumulator + currentValue);
 
@@ -81,7 +79,7 @@ class App extends Component {
             validatedBlur,
             validatedNotBlur,
             notValidatedBlur,
-            notValidatedNotBlur
+            notValidatedNotBlur,
         };
 
         return stats;
@@ -92,12 +90,12 @@ class App extends Component {
         const newData = [...prevData];
         newData[index] = {
             ...newData[index],
-            validation: event.target.value
+            validation: event.target.value,
         };
 
         this.setState({
             data: newData,
-            stats: this.processStats(newData)
+            stats: this.processStats(newData),
         });
     };
 
@@ -106,60 +104,34 @@ class App extends Component {
         const newData = [...prevData];
         newData[index] = {
             ...newData[index],
-            blur: event.target.value
+            blur: event.target.value,
         };
 
         this.setState({
             data: newData,
-            stats: this.processStats(newData)
+            stats: this.processStats(newData),
         });
     };
 
     createPDF = () => {
         this.setState({ ...this.state, onSave: true }, () => {
-            const input = window.document.getElementById("pdf");
-            html2canvas(input).then(canvas => {
-                // const imgData = canvas.toDataURL("image/png");
-                const pdf = new jsPDF("landscape");
-                let y = 0;
-
-                for (let item of this.state.data) {
-                    let x = 0;
-
-                    for (let key in item) {
-                        item.hasOwnProperty(key);
-
-                        x += 20;
-                        if (key === "image") {
-                            const imgData =
-                                "data:image/jpeg;base64," +
-                                window.btoa(`/images/${item[key]}.jpg`);
-                            pdf.addImage(imgData, "JPEG", x, y);
-                            x += 30;
-                        } else {
-                            pdf.text(key, x, y);
-                            x += 30;
-                            pdf.text(item[key], x, y);
-                            x += 30;
-                        }
-                    }
-                    pdf.line(20, 20, 60, 20);
-                    y += 20;
+            axios.get('http://localhost:8000/pdf').then((res) => {
+                if (res.status(200)) {
+                    window.location.assign('/download.pdf');
                 }
-
-                // pdf.addImage(imgData, "JPEG", 0, 0, 0, 0);
-                pdf.save("download.pdf");
+                this.setState({ ...this.state, onSave: false });
             });
-            this.setState({ ...this.state, onSave: false });
         });
     };
 
     handleOnUpload = () => {
         const data = new FormData();
-        data.append("plateFile", document.getElementById("file").files[0]);
+        data.append('plateFile', document.getElementById('file').files[0]);
 
-        axios.post("http://localhost:8000/upload", data).then(res => {
+        axios.post('http://localhost:8000/upload', data).then((res) => {
             const response = res.data;
+
+            console.log(response);
 
             this.setState({ ...this.state, data: response.data });
         });
@@ -168,7 +140,7 @@ class App extends Component {
     render() {
         const { data, stats } = this.state;
 
-        const imagesList = data.map(item => {
+        const imagesList = data.map((item) => {
             return (
                 <div className="datapoint">
                     <img
@@ -180,7 +152,7 @@ class App extends Component {
             );
         });
 
-        const contentsList = data.map(item => {
+        const contentsList = data.map((item) => {
             return (
                 <div className="datapoint">
                     <h1>{item.content}</h1>
@@ -196,8 +168,8 @@ class App extends Component {
                             type="radio"
                             name="validation"
                             value="true"
-                            checked={item.validation === "true"}
-                            onChange={e =>
+                            checked={item.validation === 'true'}
+                            onChange={(e) =>
                                 this.handleValidationChange(e, index)
                             }
                         />
@@ -207,8 +179,8 @@ class App extends Component {
                             type="radio"
                             name="validation"
                             value="false"
-                            checked={item.validation === "false"}
-                            onChange={e =>
+                            checked={item.validation === 'false'}
+                            onChange={(e) =>
                                 this.handleValidationChange(e, index)
                             }
                         />
@@ -227,8 +199,8 @@ class App extends Component {
                             type="radio"
                             name="blur"
                             value="true"
-                            checked={item.blur === "true"}
-                            onChange={e => this.handleBlurChange(e, index)}
+                            checked={item.blur === 'true'}
+                            onChange={(e) => this.handleBlurChange(e, index)}
                         />
                         <h2>True</h2>
                         <br />
@@ -236,8 +208,8 @@ class App extends Component {
                             type="radio"
                             name="blur"
                             value="false"
-                            checked={item.blur === "false"}
-                            onChange={e => this.handleBlurChange(e, index)}
+                            checked={item.blur === 'false'}
+                            onChange={(e) => this.handleBlurChange(e, index)}
                         />
                         <h2>False</h2>
                         <br />
@@ -261,8 +233,8 @@ class App extends Component {
                     <div className="button-container">
                         <br />
                         <form role="form" className="form">
-                            <div class="form-group">
-                                <label for="file">File</label>
+                            <div className="form-group">
+                                <label htmlFor="file">File</label>
                                 <input id="file" type="file" name="plateFile" />
                             </div>
                             <button
@@ -342,7 +314,7 @@ class App extends Component {
                         Save as CSV
                     </button>
                     <button onClick={() => this.createPDF()}>
-                        {this.state.onSave ? "Loading ..." : "Save as PDF"}
+                        {this.state.onSave ? 'Loading ...' : 'Save as PDF'}
                     </button>
                 </div>
             </div>

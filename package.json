@@ -19,6 +19,10 @@
         "react-scripts": "1.1.4",
         "rimraf": "^2.6.2"
     },
+    "devDependencies": {
+        "eslint": "^5.1.0",
+        "eslint-config-google": "^0.9.1"
+    },
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
