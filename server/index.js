@@ -8,6 +8,7 @@ const fileUpload = require('express-fileupload');
 const rimraf = require('rimraf');
 const cors = require('cors');
 const PDFDocument = require('pdfkit');
+const _ = require('lodash');
 
 const app = express();
 const port = 8000;
@@ -79,27 +80,31 @@ app.post('/upload', (req, res) => {
 app.get('/pdf', (req, res) => {
     console.log('Generating PDF.');
     const doc = new PDFDocument();
-    let x = 0;
-    let y = 50;
+    let x = 20;
+    let y = 20;
     let row = 0;
 
     const output = getPlateFiles();
     const stats = processStats(output);
 
-    /*
-    console.log('Stats: ', stats);
-    for (let stat in stats) {
-        if (stats.hasOwnProperty(stat)) {
-            const key = stat;
-            const value = stats[stat];
+    doc.text(`Nodeflux License Plate Validation Report`, x, y);
+    y += 40;
 
-            console.log(`${key}: ${value}`);
+    let j = 0;
+    for (let key in stats) {
+        if (stats.hasOwnProperty(key)) {
+            const value = stats[key];
 
-            x += 20;
-            doc.text(`${key}: `, x, y);
-            x += 60;
-            doc.text(`${stats[stat]}`, x, y);
-            x += 80;
+            if (j % 2 === 0 && j !== 0) {
+                y += 40;
+                x = 20;
+            }
+
+            doc.text(`${camelToSentence(key)}: `, x, y);
+            x += 140;
+            doc.text(`${value}`, x, y);
+            x += 200;
+            j++;
         }
     }
 
@@ -107,11 +112,13 @@ app.get('/pdf', (req, res) => {
     doc.addPage({
         margin: 15,
     });
-    */
+
+    x = 20;
+    y = 20;
 
     for (let item of output) {
         x = 0;
-        console.log('Processing row ', row);
+        // console.log('Processing row ', row);
 
         // Add new page if row exceeding 20
         if (row > 20) {
@@ -148,12 +155,12 @@ app.get('/pdf', (req, res) => {
 
     const pdfFilePath = 'public/download.pdf';
 
-    console.log('Writing PDF.');
+    // console.log('Writing PDF.');
 
     doc.pipe(fs.createWriteStream(pdfFilePath));
     doc.end();
 
-    console.log('PDF created.');
+    // console.log('PDF created.');
     res.status(200).send('READY');
 });
 
@@ -166,28 +173,28 @@ const processStats = (data) => {
         .map((item) => (item.blur === 'true' ? 1 : 0))
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const vb = data
+    const validatedBlur = data
         .map(
             (item) =>
                 item.validation === 'true' && item.blur === 'true' ? 1 : 0
         )
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const vnb = data
+    const validatedNotBlur = data
         .map(
             (item) =>
                 item.validation === 'true' && item.blur === 'false' ? 1 : 0
         )
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const nvb = data
+    const notValidatedBlur = data
         .map(
             (item) =>
                 item.validation === 'false' && item.blur === 'true' ? 1 : 0
         )
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const nvnb = data
+    const notValidatedNotBlur = data
         .map(
             (item) =>
                 item.validation === 'false' && item.blur === 'false' ? 1 : 0
@@ -196,13 +203,20 @@ const processStats = (data) => {
 
     const stats = {
         content: data.length,
+        accuracy: `${validated / data.length}`,
         validated,
         blur,
-        vb,
-        vnb,
-        nvb,
-        nvnb,
+        validatedBlur,
+        validatedNotBlur,
+        notValidatedBlur,
+        notValidatedNotBlur,
     };
 
     return stats;
+};
+
+const camelToSentence = (text) => {
+    let result = text.replace(/([A-Z])/g, ' $1');
+    let finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+    return finalResult;
 };
