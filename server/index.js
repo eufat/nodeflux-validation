@@ -77,7 +77,7 @@ app.post('/upload', (req, res) => {
 });
 
 app.get('/pdf', (req, res) => {
-    console.log('Generating PDF ...');
+    console.log('Generating PDF.');
     const doc = new PDFDocument();
     let x = 0;
     let y = 50;
@@ -86,23 +86,32 @@ app.get('/pdf', (req, res) => {
     const output = getPlateFiles();
     const stats = processStats(output);
 
+    /*
     console.log('Stats: ', stats);
     for (let stat in stats) {
-        if (stat.hasOwnProperty(stats)) {
+        if (stats.hasOwnProperty(stat)) {
+            const key = stat;
+            const value = stats[stat];
+
+            console.log(`${key}: ${value}`);
+
             x += 20;
-            doc.text(`${stat}: `, x, y);
-            x += 50;
-            doc.text(stats[stat], x, y);
+            doc.text(`${key}: `, x, y);
+            x += 60;
+            doc.text(`${stats[stat]}`, x, y);
             x += 80;
         }
     }
 
+    console.log('Adding page');
     doc.addPage({
         margin: 15,
     });
+    */
 
     for (let item of output) {
         x = 0;
+        console.log('Processing row ', row);
 
         // Add new page if row exceeding 20
         if (row > 20) {
@@ -127,21 +136,25 @@ app.get('/pdf', (req, res) => {
                     // Set license plate content
                     doc.text(`${key}: `, x, y);
                     x += 60;
-                    doc.text(item[key], x, y);
+                    doc.text(`${item[key]}`, x, y);
                     x += 80;
                 }
             }
         }
 
         row++;
-        y += 40;
+        y += 30;
     }
 
     const pdfFilePath = 'public/download.pdf';
 
+    console.log('Writing PDF.');
+
     doc.pipe(fs.createWriteStream(pdfFilePath));
     doc.end();
-    res.status(200).send('ready');
+
+    console.log('PDF created.');
+    res.status(200).send('READY');
 });
 
 const processStats = (data) => {
@@ -153,28 +166,28 @@ const processStats = (data) => {
         .map((item) => (item.blur === 'true' ? 1 : 0))
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const validatedBlur = data
+    const vb = data
         .map(
             (item) =>
                 item.validation === 'true' && item.blur === 'true' ? 1 : 0
         )
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const validatedNotBlur = data
+    const vnb = data
         .map(
             (item) =>
                 item.validation === 'true' && item.blur === 'false' ? 1 : 0
         )
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const notValidatedBlur = data
+    const nvb = data
         .map(
             (item) =>
                 item.validation === 'false' && item.blur === 'true' ? 1 : 0
         )
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const notValidatedNotBlur = data
+    const nvnb = data
         .map(
             (item) =>
                 item.validation === 'false' && item.blur === 'false' ? 1 : 0
@@ -185,10 +198,10 @@ const processStats = (data) => {
         content: data.length,
         validated,
         blur,
-        validatedBlur,
-        validatedNotBlur,
-        notValidatedBlur,
-        notValidatedNotBlur,
+        vb,
+        vnb,
+        nvb,
+        nvnb,
     };
 
     return stats;

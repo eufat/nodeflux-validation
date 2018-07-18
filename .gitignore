@@ -22,3 +22,5 @@ yarn-error.log*
 
 /public/plate*
 /public/plate.zip
+/public/download.csv
+/public/download.pdf

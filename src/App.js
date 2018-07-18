@@ -144,7 +144,8 @@ class App extends Component {
                     <img
                         src={`${item.image}`}
                         alt={`images-${item.image}`}
-                        height={200}
+                        width="100%"
+                        height="auto"
                     />
                 </div>
             );
@@ -171,7 +172,7 @@ class App extends Component {
                                 this.handleValidationChange(e, index)
                             }
                         />
-                        <h2>True</h2>
+                        <span>Yes</span>
                         <br />
                         <input
                             type="radio"
@@ -182,7 +183,7 @@ class App extends Component {
                                 this.handleValidationChange(e, index)
                             }
                         />
-                        <h2>False</h2>
+                        <span>No</span>
                         <br />
                     </form>
                 </div>
@@ -200,7 +201,7 @@ class App extends Component {
                             checked={item.blur === 'true'}
                             onChange={(e) => this.handleBlurChange(e, index)}
                         />
-                        <h2>True</h2>
+                        <span>Yes</span>
                         <br />
                         <input
                             type="radio"
@@ -209,7 +210,7 @@ class App extends Component {
                             checked={item.blur === 'false'}
                             onChange={(e) => this.handleBlurChange(e, index)}
                         />
-                        <h2>False</h2>
+                        <span>No</span>
                         <br />
                     </form>
                 </div>
@@ -224,86 +225,84 @@ class App extends Component {
                 <div className="app">
                     <header>
                         <h1 className="app-title">
-                            License Plate Validation Tools
+                            Nodeflux License Plate Validation Tools
                         </h1>
-                    </header>
-                    <br />
-                    <div className="button-container">
-                        <br />
-                        <form role="form" className="form">
-                            <div className="form-group">
-                                <label htmlFor="file">File</label>
+                        <div className="button-container">
+                            <form role="form" className="form">
                                 <input id="file" type="file" name="plateFile" />
-                            </div>
-                            <button
-                                onClick={() => this.handleOnUpload()}
-                                type="button"
-                            >
-                                Upload
-                            </button>
-                        </form>
-                    </div>
-                    <br />
-                    <div id="pdf">
-                        <div>Stats</div>
+                                <button
+                                    onClick={() => this.handleOnUpload()}
+                                    type="button"
+                                >
+                                    Upload
+                                </button>
+                            </form>
+                        </div>
                         <div className="stats">
                             <div className="container">
-                                <h2>Content: {this.state.stats.content} </h2>
+                                <h4>Content: {this.state.stats.content} </h4>
                             </div>
                             <div className="container">
-                                <h2>Validated: {this.state.stats.validated}</h2>
+                                <h4>Validated: {this.state.stats.validated}</h4>
                             </div>
                             <div className="container">
-                                <h2>Blur: {this.state.stats.blur}</h2>
+                                <h4>Blur: {this.state.stats.blur}</h4>
                             </div>
                             <div className="container">
-                                <h2>
+                                <h4>
                                     Accuracy:
                                     {percentValidated}%
-                                </h2>
+                                </h4>
                             </div>
                             <div className="container">
-                                <h2>
+                                <h4>
                                     Validated Blur:
                                     {this.state.stats.validatedBlur}
-                                </h2>
+                                </h4>
                             </div>
                             <div className="container">
-                                <h2>
+                                <h4>
                                     Validated Not Blur:
                                     {this.state.stats.validatedNotBlur}
-                                </h2>
+                                </h4>
                             </div>
                             <div className="container">
-                                <h2>
+                                <h4>
                                     Not Validated Blur:
                                     {this.state.stats.notValidatedBlur}
-                                </h2>
+                                </h4>
                             </div>
                             <div className="container">
-                                <h2>
+                                <h4>
                                     Not Validated Not Blur:
                                     {this.state.stats.notValidatedNotBlur}
-                                </h2>
+                                </h4>
                             </div>
                         </div>
-                        <div className="contents">
+                        <div className="contents-header">
                             <div className="container">
-                                <div>Images </div>
-                                {imagesList}
+                                <h4>Images </h4>
                             </div>
                             <div className="container">
-                                <div>Contents </div>
-                                {contentsList}
+                                <h4>Contents </h4>
                             </div>
                             <div className="container">
-                                <div>Validator</div>
-                                <div>{validationsList}</div>
+                                <h4>Valid</h4>
                             </div>
                             <div className="container">
-                                <div>Blur</div>
-                                <div>{blursList}</div>
+                                <h4>Blur</h4>
                             </div>
+                        </div>
+                    </header>
+
+                    <div className="contents">
+                        <div className="container">{imagesList}</div>
+                        <div className="container">{contentsList}</div>
+                        <div className="container">
+                            <div>{validationsList}</div>
+                        </div>
+                        <div className="container">
+                            <div>{blursList}</div>
                         </div>
                     </div>
                 </div>
