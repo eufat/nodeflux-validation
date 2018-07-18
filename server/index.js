@@ -77,34 +77,119 @@ app.post('/upload', (req, res) => {
 });
 
 app.get('/pdf', (req, res) => {
+    console.log('Generating PDF ...');
     const doc = new PDFDocument();
-    let y = 0;
+    let x = 0;
+    let y = 50;
+    let row = 0;
 
     const output = getPlateFiles();
+    const stats = processStats(output);
+
+    console.log('Stats: ', stats);
+    for (let stat in stats) {
+        if (stat.hasOwnProperty(stats)) {
+            x += 20;
+            doc.text(`${stat}: `, x, y);
+            x += 50;
+            doc.text(stats[stat], x, y);
+            x += 80;
+        }
+    }
+
+    doc.addPage({
+        margin: 15,
+    });
 
     for (let item of output) {
-        let x = 0;
+        x = 0;
 
+        // Add new page if row exceeding 20
+        if (row > 20) {
+            doc.addPage({
+                margin: 15,
+            });
+            row = 0;
+            x = 0;
+            y = 50;
+        }
+
+        // Iterate to get column of each row
         for (let key in item) {
             if (item.hasOwnProperty(key)) {
                 x += 20;
+
+                // Set license plate image
                 if (key === 'image') {
                     doc.image(`public${item[key]}`, x, y);
                     x += 60;
                 } else {
-                    doc.text(key, x, y);
+                    // Set license plate content
+                    doc.text(`${key}: `, x, y);
                     x += 60;
                     doc.text(item[key], x, y);
-                    x += 60;
+                    x += 80;
                 }
             }
         }
-        y += 20;
+
+        row++;
+        y += 40;
     }
 
     const pdfFilePath = 'public/download.pdf';
 
     doc.pipe(fs.createWriteStream(pdfFilePath));
     doc.end();
-    res.status(200).send('READY');
+    res.status(200).send('ready');
 });
+
+const processStats = (data) => {
+    const validated = data
+        .map((item) => (item.validation === 'true' ? 1 : 0))
+        .reduce((accumulator, currentValue) => accumulator + currentValue);
+
+    const blur = data
+        .map((item) => (item.blur === 'true' ? 1 : 0))
+        .reduce((accumulator, currentValue) => accumulator + currentValue);
+
+    const validatedBlur = data
+        .map(
+            (item) =>
+                item.validation === 'true' && item.blur === 'true' ? 1 : 0
+        )
+        .reduce((accumulator, currentValue) => accumulator + currentValue);
+
+    const validatedNotBlur = data
+        .map(
+            (item) =>
+                item.validation === 'true' && item.blur === 'false' ? 1 : 0
+        )
+        .reduce((accumulator, currentValue) => accumulator + currentValue);
+
+    const notValidatedBlur = data
+        .map(
+            (item) =>
+                item.validation === 'false' && item.blur === 'true' ? 1 : 0
+        )
+        .reduce((accumulator, currentValue) => accumulator + currentValue);
+
+    const notValidatedNotBlur = data
+        .map(
+            (item) =>
+                item.validation === 'false' && item.blur === 'false' ? 1 : 0
+        )
+        .reduce((accumulator, currentValue) => accumulator + currentValue);
+
+    const stats = {
+        content: data.length,
+        validated,
+        blur,
+        validatedBlur,
+        validatedNotBlur,
+        notValidatedBlur,
+        notValidatedNotBlur,
+    };
+
+    return stats;
+};
