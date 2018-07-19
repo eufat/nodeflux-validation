@@ -45,8 +45,8 @@ const getPlateFiles = () => {
             output.push({
                 image: `/plate/${file}`,
                 content: filename,
-                validation: 'false',
-                blur: 'false',
+                validation: '',
+                blur: '',
             });
         }
     });

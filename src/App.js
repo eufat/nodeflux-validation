@@ -165,27 +165,34 @@ class App extends Component {
             return (
                 <div className="validation">
                     <form>
-                        <input
-                            type="radio"
-                            name="validation"
-                            value="true"
-                            checked={item.validation === 'true'}
-                            onChange={(e) =>
-                                this.handleValidationChange(e, index)
-                            }
-                        />
-                        <span>Yes</span>
+                        <div>
+                            <input
+                                type="radio"
+                                name="validation"
+                                value="true"
+                                id="yes"
+                                checked={item.validation === 'true'}
+                                onChange={(e) =>
+                                    this.handleValidationChange(e, index)
+                                }
+                            />
+                            <label htmlFor="yes">Yes</label>
+                        </div>
                         <br />
-                        <input
-                            type="radio"
-                            name="validation"
-                            value="false"
-                            checked={item.validation === 'false'}
-                            onChange={(e) =>
-                                this.handleValidationChange(e, index)
-                            }
-                        />
-                        <span>No</span>
+                        <div>
+                            <input
+                                className="red"
+                                type="radio"
+                                name="validation"
+                                value="false"
+                                id="no"
+                                checked={item.validation === 'false'}
+                                onChange={(e) =>
+                                    this.handleValidationChange(e, index)
+                                }
+                            />
+                            <label htmlFor="no">No</label>
+                        </div>
                         <br />
                     </form>
                 </div>
