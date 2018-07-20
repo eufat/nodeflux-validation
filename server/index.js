@@ -202,7 +202,7 @@ const processStats = (data) => {
         )
         .reduce((accumulator, currentValue) => accumulator + currentValue);
 
-    const accuracy = `${Math.round((validated * 100) / data.length, 3)} %`;
+    const accuracy = `${((validated * 100) / data.length).toFixed(2)} %`;
 
     const stats = {
         content: data.length,

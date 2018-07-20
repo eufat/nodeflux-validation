@@ -285,7 +285,7 @@ class App extends Component {
                             <div className="container">
                                 <h4>
                                     Accuracy:
-                                    {percentValidated}%
+                                    {percentValidated.toFixed(2)}%
                                 </h4>
                             </div>
                             <div className="container">
