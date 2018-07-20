@@ -140,9 +140,25 @@ class App extends Component {
     render() {
         const { data, stats } = this.state;
 
+        const bg = (validation) => {
+            switch (validation) {
+                case 'true':
+                    return 'palegreen';
+                    break;
+                case 'false':
+                    return 'pink';
+                    break;
+                default:
+                    return 'white';
+            }
+        };
+
         const imagesList = data.map((item) => {
             return (
-                <div className="datapoint">
+                <div
+                    className="datapoint"
+                    style={{ backgroundColor: bg(item.validation) }}
+                >
                     <img
                         src={`${item.image}`}
                         alt={`images-${item.image}`}
@@ -155,7 +171,10 @@ class App extends Component {
 
         const contentsList = data.map((item) => {
             return (
-                <div className="datapoint">
+                <div
+                    className="datapoint"
+                    style={{ backgroundColor: bg(item.validation) }}
+                >
                     <h1>{item.content}</h1>
                 </div>
             );
@@ -163,14 +182,17 @@ class App extends Component {
 
         const validationsList = data.map((item, index) => {
             return (
-                <div className="validation">
+                <div
+                    className="validation"
+                    style={{ backgroundColor: bg(item.validation) }}
+                >
                     <form>
                         <div>
                             <input
                                 type="radio"
                                 name="validation"
                                 value="true"
-                                id="yes"
+                                className="yes"
                                 checked={item.validation === 'true'}
                                 onChange={(e) =>
                                     this.handleValidationChange(e, index)
@@ -185,7 +207,7 @@ class App extends Component {
                                 type="radio"
                                 name="validation"
                                 value="false"
-                                id="no"
+                                className="no"
                                 checked={item.validation === 'false'}
                                 onChange={(e) =>
                                     this.handleValidationChange(e, index)
@@ -201,7 +223,10 @@ class App extends Component {
 
         const blursList = data.map((item, index) => {
             return (
-                <div className="blur">
+                <div
+                    className="blur"
+                    style={{ backgroundColor: bg(item.validation) }}
+                >
                     <form>
                         <input
                             type="radio"
